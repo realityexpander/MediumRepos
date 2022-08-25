@@ -4,12 +4,14 @@ import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor() : AuthRepository {
 
-    override fun refreshToken(refreshToken: String): String {
+    override fun refreshAccessToken(refreshToken: String): String {
+        println("Getting Access token using refreshToken: $refreshToken")
         /* .... */
-        return ""
+        return "NEW_ACCESS_TOKEN"
     }
 
     override fun logout() {
+        println("Logout")
         /* .... */
     }
 }

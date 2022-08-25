@@ -16,7 +16,7 @@ class AuthInterceptorImpl @Inject constructor(
         var accessToken = pref.getAccessToken()
 
         if (accessToken.isNullOrBlank()) {
-            accessToken = refreshToken()
+            accessToken = refreshAccessToken()
             if (accessToken.isNullOrBlank()) {
                 authRepository.logout()
                 return chain.proceed(request)
@@ -27,10 +27,11 @@ class AuthInterceptorImpl @Inject constructor(
 
         if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
             val newAccessToken = pref.getAccessToken()
+
             if (newAccessToken != accessToken) {
                 return chain.proceed(newRequestWithAccessToken(accessToken, request))
             } else {
-                accessToken = refreshToken()
+                accessToken = refreshAccessToken()
                 if (accessToken.isNullOrBlank()) {
                     authRepository.logout()
                     return response
@@ -47,11 +48,12 @@ class AuthInterceptorImpl @Inject constructor(
             .header("Authorization", "Bearer $accessToken")
             .build()
 
-    private fun refreshToken(): String? {
+    private fun refreshAccessToken(): String? {
         synchronized(this) {
             val refreshToken = pref.getRefreshToken()
+
             refreshToken?.let {
-                val accessToken = authRepository.refreshToken(refreshToken)
+                val accessToken = authRepository.refreshAccessToken(refreshToken)
                 pref.setAccessToken(accessToken)
                 return accessToken
             } ?: return null
